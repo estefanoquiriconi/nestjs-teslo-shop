@@ -25,6 +25,12 @@ $ cp .env.template .env
 $ docker compose up -d
 ```
 
+6. Ejecutar SEED
+
+```
+http://localhost:3000/api/seed
+```
+
 ## Project setup
 
 ```bash

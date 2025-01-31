@@ -1,10 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +6,7 @@ import { DataSource, Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { isUUID } from 'class-validator';
 import { Product, ProductImage } from './entities';
+import { handlePgError } from 'src/common/errors/handlePgError';
 
 interface PgError {
   code: string;
@@ -21,8 +16,6 @@ interface PgError {
 
 @Injectable()
 export class ProductsService {
-  private readonly logger = new Logger('ProductsService');
-
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
@@ -48,7 +41,7 @@ export class ProductsService {
 
       return { ...product, images };
     } catch (error) {
-      this.handleDBExceptions(error as PgError);
+      handlePgError(error as PgError);
     }
   }
 
@@ -128,7 +121,7 @@ export class ProductsService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
 
-      this.handleDBExceptions(error as PgError);
+      handlePgError(error as PgError);
     } finally {
       await queryRunner.release();
     }
@@ -139,20 +132,12 @@ export class ProductsService {
     await this.productRepository.remove(product);
   }
 
-  private handleDBExceptions(error: PgError) {
-    this.logger.error(error.message);
-    if (error.code === '23505') throw new ConflictException(error.detail);
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
-  }
-
   async deleteAllProducts() {
     const query = this.productRepository.createQueryBuilder('product');
     try {
       return await query.delete().where({}).execute();
     } catch (error) {
-      this.handleDBExceptions(error as PgError);
+      handlePgError(error as PgError);
     }
   }
 }

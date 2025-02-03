@@ -15,7 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Product {
   @ApiProperty({
     example: '15a7d223-ba01-4977-ad3d-e5a130749883',
-    description: 'Product ID',
+    description: 'Unique identifier for the product',
     uniqueItems: true,
   })
   @PrimaryGeneratedColumn('uuid')
@@ -23,7 +23,7 @@ export class Product {
 
   @ApiProperty({
     example: 'T-shirt',
-    description: 'Product title',
+    description: 'The title of the product',
     uniqueItems: true,
   })
   @Column('text', { unique: true })
@@ -31,14 +31,14 @@ export class Product {
 
   @ApiProperty({
     example: 0,
-    description: 'Product price',
+    description: 'The price of the product',
   })
   @Column('float', { default: 0 })
   price: number;
 
   @ApiProperty({
     example: 'Anim reprehenderit nulla in anim mollit ni irure commodo.',
-    description: 'Product description',
+    description: 'A brief description of the product',
     default: null,
   })
   @Column('text', { nullable: true })
@@ -46,7 +46,7 @@ export class Product {
 
   @ApiProperty({
     example: 't_shirt',
-    description: 'Product slug',
+    description: 'A URL-friendly identifier for the product',
     uniqueItems: true,
   })
   @Column('text', { unique: true })
@@ -54,7 +54,7 @@ export class Product {
 
   @ApiProperty({
     example: 10,
-    description: 'Product stock',
+    description: 'The available stock of the product',
     default: 0,
   })
   @Column('int', { default: 0 })
@@ -62,26 +62,30 @@ export class Product {
 
   @ApiProperty({
     example: ['S', 'M', 'L'],
-    description: 'Product sizes',
+    description: 'Available sizes for the product',
   })
   @Column('text', { array: true })
   sizes: string[];
 
   @ApiProperty({
     example: 'women',
-    description: 'Product gender',
+    description: 'The target gender for the product',
   })
   @Column('text')
   gender: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tags associated with the product for categorization',
+  })
   @Column('text', {
     array: true,
     default: [],
   })
   tags: string[];
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Images associated with the product',
+  })
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     cascade: true,
     eager: true,

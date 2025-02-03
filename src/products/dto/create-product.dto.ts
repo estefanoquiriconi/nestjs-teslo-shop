@@ -80,7 +80,7 @@ export class CreateProductDto {
   gender: string;
 
   @ApiProperty({
-    description: 'The tag of the product',
+    description: 'The tags associated with the product',
     nullable: true,
     type: 'array',
   })
